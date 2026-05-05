@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Winning.Playwright.NUnit/Winning.Playwright.NUnit.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Winning.Playwright.NUnit.Tests/Winning.Playwright.NUnit.Tests.csproj" />
+  </Folder>
+</Solution>

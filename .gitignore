@@ -1,0 +1,9 @@
+bin/
+obj/
+.vs/
+*.user
+packages/
+TestResults/
+*.trx
+.nuget/
+external/

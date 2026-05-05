@@ -1,0 +1,13 @@
+<Project>
+  <PropertyGroup>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Authors>Winning</Authors>
+    <Copyright>Copyright (c) 2026 Winning</Copyright>
+    <PackageProjectUrl>https://github.com/winningconsulting/Winning.Playwright.NUnit</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/winningconsulting/Winning.Playwright.NUnit</RepositoryUrl>
+  </PropertyGroup>
+</Project>

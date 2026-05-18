@@ -17,11 +17,10 @@ NuGet packages are not published yet. For now, consume this library by adding it
 
 ### 1. Add this repository as a submodule
 
-From your repository root, choose a directory for the submodule (the examples use `externals/Winning.Playwright.NUnit`; adjust if you prefer another path) and add it to `.gitignore`.
+From your repository root, choose a directory for the submodule (the examples use `externals/Winning.Playwright.NUnit`; adjust if you prefer another path).
 
 ```bash
 git submodule add https://github.com/winningconsulting/Winning.Playwright.NUnit.git externals/Winning.Playwright.NUnit
-echo "externals/Winning.Playwright.NUnit" >> .gitignore
 ```
 
 Afterwards, and also anytime someone clones your repository, it must initialize the submodules:

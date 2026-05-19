@@ -3,6 +3,6 @@
     <Project Path="src/Winning.Playwright.NUnit/Winning.Playwright.NUnit.csproj" />
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="tests/Winning.Playwright.NUnit.Tests/Winning.Playwright.NUnit.Tests.csproj" />
+    <Project Path="tests/Winning.Playwright.NUnit.EndToEndTests/Winning.Playwright.NUnit.EndToEndTests.csproj" />
   </Folder>
 </Solution>

@@ -121,12 +121,14 @@ dotnet build
 dotnet test
 ```
 
-The fixture **`WinningPageTestScreencastSmokeTests`** turns screencast and tracing on in code (**`IsScreencastEnabled`**, **`IsTracingEnabled`**, **`TraceAllTests`**) so a successful run writes under **`Passed/`**. In a normal **`dotnet test`**, **only `Smoke_Arrange_Act_AssertThat_Succeeds`** executes (the non-explicit, passing smoke test). Three other tests whose names start with **`Smoke_`** are marked **`[Explicit]`** and **fail or go inconclusive on purpose** (one per stage: arrange, act, assert). They are **skipped by default** so typical CI or local runs stay green.
+### End-to-end tests and dummy fixtures
 
-To run those **explicit** **`Smoke_*`** tests—only when you choose to—use a name filter and **`NUnit.RunExplicitTests=true`**. That runs all four **`Smoke_*`** methods; the three explicit demos **are expected to fail or inconclude**, so the run usually exits with failures unless you narrow the filter. You need browsers installed and a Chromium that supports the screencast overlay APIs:
+The solution includes **`Winning.Playwright.NUnit.EndToEndTests`**, whose tests spawn **`dotnet test`** subprocesses that run the **`DummyTests`** fixture one method at a time and validate screencasts, traces, and TRX attachments against what the library writes.
+
+To inspect artifacts yourself (without running that validation layer), run the dummy tests directly from the same project. They are marked **`[Explicit]`** and cover pass, fail, and inconclusive outcomes on purpose—**some methods pass and others fail or go inconclusive**.
 
 ```bash
-dotnet test --filter "Name=~Smoke"
+dotnet test --filter "DummyTests"
 ```
 
 To package the library for NuGet:

@@ -198,6 +198,10 @@ internal sealed class ScreencastRecorder
             Directory.CreateDirectory(destinationDir);
             var destinationPath = Path.Combine(destinationDir, Path.GetFileName(this.recordingAbsolutePath));
             File.Move(this.recordingAbsolutePath, destinationPath, overwrite: true);
+
+            var absoluteDestinationPath = Path.GetFullPath(destinationPath);
+            var relPath = Path.GetRelativePath(TestContext.CurrentContext.WorkDirectory, absoluteDestinationPath);
+            TestContext.AddTestAttachment(relPath, "Screencast Recording");
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {

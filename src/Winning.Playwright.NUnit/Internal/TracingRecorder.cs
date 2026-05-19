@@ -64,6 +64,15 @@ internal sealed class TracingRecorder
         }
 
         await this.context.Tracing.StopAsync(stopOptions);
+
+        if (stopOptions.Path is null)
+        {
+            return;
+        }
+
+        var absolutePath = Path.GetFullPath(stopOptions.Path);
+        var relPath = Path.GetRelativePath(TestContext.CurrentContext.WorkDirectory, absolutePath);
+        TestContext.AddTestAttachment(relPath, "Playwright Trace");
     }
 
     /// <summary>Starts a trace group for a stage.</summary>

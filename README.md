@@ -82,7 +82,7 @@ public sealed class LoginTests : WinningPageTest
 
 Screencast files are named `yyyyMMdd_HHmmss_fff_<sanitized test name>.webm` and moved into the outcome subfolder when recording stops. Trace ZIPs use the same timestamp pattern under the outcome folder rules above.
 
-Each saved artifact is also registered with NUnit via `TestContext.AddTestAttachment`, using a path relative to `TestContext.CurrentContext.WorkDirectory`. This makes the files available as attachments in IDE test explorers and result reports. Note that some result loggers (e.g. TRX) may copy referenced files into their own output directory rather than linking to the originals.
+Each saved artifact is also registered with NUnit via `TestContext.AddTestAttachment`, using a path relative to `TestContext.CurrentContext.WorkDirectory`. The path registered for attachments uses a short file name derived from the attachment description (for example `Screencast Recording.webm` or `Playwright Trace.zip`), via a symlink (or file copy fallback) next to the timestamped artifact file, so loggers that only show the file name (e.g. TRX) stay readable while on-disk artifacts keep the long names. Note that some result loggers may copy referenced files into their own output directory rather than linking to the originals.
 
 ### Warning: Microsoft.Playwright 1.59.0 and full screencast overlays
 

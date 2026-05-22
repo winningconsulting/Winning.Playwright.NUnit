@@ -52,7 +52,9 @@ public sealed class TraceRecordingTests
     {
         var trxFile = TrxReport.FindFile(scenario.Runner.TrxDir);
         Assume.That(trxFile, Is.Not.Null, "No TRX file was generated.");
-        Assert.That(TrxReport.ReadAttachmentPaths(trxFile!), Has.Some.EndsWith(".zip"),
-            "Expected a .zip trace to be listed as an attachment in the TRX report.");
+        Assert.That(
+            TrxReport.ReadAttachmentPaths(trxFile!),
+            Has.Some.EndsWith("Playwright Trace.zip"),
+            "Expected a trace attachment named from its description in the TRX report.");
     }
 }

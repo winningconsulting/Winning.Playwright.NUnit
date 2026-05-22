@@ -12,6 +12,8 @@ namespace Winning.Playwright.NUnit.Internal;
 /// </summary>
 internal sealed class TracingRecorder
 {
+    private const string AttachmentDescription = "Playwright Trace";
+
     private readonly IBrowserContext context;
     private readonly string artifactsDir;
     private readonly bool traceAllTests;
@@ -71,8 +73,7 @@ internal sealed class TracingRecorder
         }
 
         var absolutePath = Path.GetFullPath(stopOptions.Path);
-        var relPath = Path.GetRelativePath(TestContext.CurrentContext.WorkDirectory, absolutePath);
-        TestContext.AddTestAttachment(relPath, "Playwright Trace");
+        ArtifactUtilities.AddTestAttachmentWithFriendlyFileName(absolutePath, AttachmentDescription);
     }
 
     /// <summary>Starts a trace group for a stage.</summary>

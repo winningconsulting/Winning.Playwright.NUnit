@@ -52,7 +52,9 @@ public sealed class ScreencastRecordingTests
     {
         var trxFile = TrxReport.FindFile(scenario.Runner.TrxDir);
         Assume.That(trxFile, Is.Not.Null, "No TRX file was generated.");
-        Assert.That(TrxReport.ReadAttachmentPaths(trxFile!), Has.Some.EndsWith(".webm"),
-            "Expected a .webm screencast to be listed as an attachment in the TRX report.");
+        Assert.That(
+            TrxReport.ReadAttachmentPaths(trxFile!),
+            Has.Some.EndsWith("Screencast Recording.webm"),
+            "Expected a screencast attachment named from its description in the TRX report.");
     }
 }

@@ -1,5 +1,6 @@
 using System.IO;
 using System.Text.RegularExpressions;
+using NUnit.Framework;
 
 namespace Winning.Playwright.NUnit.Internal;
 
@@ -51,6 +52,48 @@ internal static partial class ArtifactUtilities
         spaced = LowerThenUpper().Replace(spaced, " ");
         spaced = UpperUpperLower().Replace(spaced, " ");
         return CollapseSpaces().Replace(spaced.Trim(), " ");
+    }
+
+    /// <summary>
+    /// Registers <paramref name="artifactAbsolutePath"/> as a test attachment using a file name derived from
+    /// <paramref name="description"/> (plus the artifact extension), so loggers that ignore NUnit's description
+    /// (e.g. TRX) still show a short label. The artifact file on disk is unchanged; a symlink or copy
+    /// provides the friendly path passed to <see cref="TestContext.AddTestAttachment"/>.
+    /// </summary>
+    internal static void AddTestAttachmentWithFriendlyFileName(string artifactAbsolutePath, string description)
+    {
+        var directory = Path.GetDirectoryName(artifactAbsolutePath)
+            ?? throw new InvalidOperationException("Artifact path has no directory.");
+        var extension = Path.GetExtension(artifactAbsolutePath);
+        var aliasFileName = SanitizeFileName(description) + extension;
+        var aliasAbsolutePath = Path.GetFullPath(Path.Combine(directory, aliasFileName));
+
+        if (File.Exists(aliasAbsolutePath))
+        {
+            File.Delete(aliasAbsolutePath);
+        }
+
+        CreateAttachmentAlias(artifactAbsolutePath, aliasAbsolutePath);
+
+        var relPath = Path.GetRelativePath(TestContext.CurrentContext.WorkDirectory, aliasAbsolutePath);
+        TestContext.AddTestAttachment(relPath, description);
+    }
+
+    private static void CreateAttachmentAlias(string sourceAbsolutePath, string aliasAbsolutePath)
+    {
+        try
+        {
+            File.CreateSymbolicLink(aliasAbsolutePath, sourceAbsolutePath);
+            return;
+        }
+        catch (IOException)
+        {
+        }
+        catch (UnauthorizedAccessException)
+        {
+        }
+
+        File.Copy(sourceAbsolutePath, aliasAbsolutePath, overwrite: true);
     }
 
     [GeneratedRegex(@"[_\-.,]+")]

@@ -13,6 +13,8 @@ namespace Winning.Playwright.NUnit.Internal;
 /// </summary>
 internal sealed class ScreencastRecorder
 {
+    private const string AttachmentDescription = "Screencast Recording";
+
     /// <summary>Failure outcome card subtitle when the exception occurred during the act stage.</summary>
     private const string FailureOverlayExplanationActStage =
         "The test could not use the feature or interaction it targets.";
@@ -200,8 +202,7 @@ internal sealed class ScreencastRecorder
             File.Move(this.recordingAbsolutePath, destinationPath, overwrite: true);
 
             var absoluteDestinationPath = Path.GetFullPath(destinationPath);
-            var relPath = Path.GetRelativePath(TestContext.CurrentContext.WorkDirectory, absoluteDestinationPath);
-            TestContext.AddTestAttachment(relPath, "Screencast Recording");
+            ArtifactUtilities.AddTestAttachmentWithFriendlyFileName(absoluteDestinationPath, AttachmentDescription);
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {

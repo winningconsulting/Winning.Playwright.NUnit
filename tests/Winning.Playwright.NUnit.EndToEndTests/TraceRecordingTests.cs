@@ -7,6 +7,8 @@ namespace Winning.Playwright.NUnit.EndToEndTests;
 [TestFixture]
 public sealed class TraceRecordingTests
 {
+    private const string TraceFileNamePrefix = "Trace";
+
     [Test]
     public void Trace_IsSaved_InPassedFolder_WhenTestPasses() =>
         AssertTraceInOutcomeFolder(EndToEndScenarioRuns.WhenTestPasses, "Passed");
@@ -44,17 +46,24 @@ public sealed class TraceRecordingTests
         var folder = Path.Combine(scenario.ArtifactsDir, expectedOutcomeSubfolder);
         Assert.That(Directory.Exists(folder), Is.True,
             $"Expected '{expectedOutcomeSubfolder}' folder at '{folder}'.");
-        Assert.That(Directory.GetFiles(folder, "*.zip"), Has.Length.GreaterThan(0),
-            $"Expected a .zip trace file in '{folder}'.");
+        Assert.That(
+            Directory.GetFiles(folder, "*.zip").Select(Path.GetFileName),
+            Has.Some.StartsWith($"{TraceFileNamePrefix} - "),
+            $"Expected a readable .zip trace file in '{folder}'.");
     }
 
     private static void AssertTraceAttachedInTrx(ScenarioRun scenario)
     {
         var trxFile = TrxReport.FindFile(scenario.Runner.TrxDir);
         Assume.That(trxFile, Is.Not.Null, "No TRX file was generated.");
+        var attachmentFileNames = TrxReport.ReadAttachmentPaths(trxFile!)
+            .Select(Path.GetFileName)
+            .Where(fileName => fileName is not null);
         Assert.That(
-            TrxReport.ReadAttachmentPaths(trxFile!),
-            Has.Some.EndsWith("Playwright Trace.zip"),
+            attachmentFileNames.Any(fileName =>
+                fileName!.StartsWith($"{TraceFileNamePrefix} - ", StringComparison.Ordinal) &&
+                fileName.EndsWith(".zip", StringComparison.Ordinal)),
+            Is.True,
             "Expected a trace attachment named from its description in the TRX report.");
     }
 }

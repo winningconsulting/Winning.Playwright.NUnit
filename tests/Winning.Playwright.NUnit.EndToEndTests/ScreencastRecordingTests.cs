@@ -7,6 +7,8 @@ namespace Winning.Playwright.NUnit.EndToEndTests;
 [TestFixture]
 public sealed class ScreencastRecordingTests
 {
+    private const string ScreencastFileNamePrefix = "Video";
+
     [Test]
     public void Recording_IsSaved_InPassedFolder_WhenTestPasses() =>
         AssertScreencastInOutcomeFolder(EndToEndScenarioRuns.WhenTestPasses, "Passed");
@@ -44,17 +46,24 @@ public sealed class ScreencastRecordingTests
         var folder = Path.Combine(scenario.ArtifactsDir, expectedOutcomeSubfolder);
         Assert.That(Directory.Exists(folder), Is.True,
             $"Expected '{expectedOutcomeSubfolder}' folder at '{folder}'.");
-        Assert.That(Directory.GetFiles(folder, "*.webm"), Has.Length.GreaterThan(0),
-            $"Expected a .webm screencast recording in '{folder}'.");
+        Assert.That(
+            Directory.GetFiles(folder, "*.webm").Select(Path.GetFileName),
+            Has.Some.StartsWith($"{ScreencastFileNamePrefix} - "),
+            $"Expected a readable .webm screencast recording in '{folder}'.");
     }
 
     private static void AssertScreencastAttachedInTrx(ScenarioRun scenario)
     {
         var trxFile = TrxReport.FindFile(scenario.Runner.TrxDir);
         Assume.That(trxFile, Is.Not.Null, "No TRX file was generated.");
+        var attachmentFileNames = TrxReport.ReadAttachmentPaths(trxFile!)
+            .Select(Path.GetFileName)
+            .Where(fileName => fileName is not null);
         Assert.That(
-            TrxReport.ReadAttachmentPaths(trxFile!),
-            Has.Some.EndsWith("Screencast Recording.webm"),
+            attachmentFileNames.Any(fileName =>
+                fileName!.StartsWith($"{ScreencastFileNamePrefix} - ", StringComparison.Ordinal) &&
+                fileName.EndsWith(".webm", StringComparison.Ordinal)),
+            Is.True,
             "Expected a screencast attachment named from its description in the TRX report.");
     }
 }

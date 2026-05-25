@@ -13,6 +13,8 @@ namespace Winning.Playwright.NUnit.Internal;
 /// </summary>
 internal sealed class ScreencastRecorder
 {
+    private const string ArtifactFileNamePrefix = "Video";
+    private const string ArtifactFileExtension = ".webm";
     private const string AttachmentDescription = "Screencast Recording";
 
     /// <summary>Failure outcome card subtitle when the exception occurred during the act stage.</summary>
@@ -50,8 +52,7 @@ internal sealed class ScreencastRecorder
     {
         Directory.CreateDirectory(this.artifactsDir);
 
-        var testName = ArtifactUtilities.SanitizeFileName(TestContext.CurrentContext.Test.Name);
-        var relativePath = $"{DateTime.Now:yyyyMMdd_HHmmss_fff}_{testName}.webm";
+        var relativePath = ArtifactUtilities.BuildArtifactFileName(ArtifactFileNamePrefix, ArtifactFileExtension);
         var screencastPath = Path.Combine(this.artifactsDir, relativePath);
         this.recordingAbsolutePath = Path.GetFullPath(screencastPath);
 
@@ -202,7 +203,7 @@ internal sealed class ScreencastRecorder
             File.Move(this.recordingAbsolutePath, destinationPath, overwrite: true);
 
             var absoluteDestinationPath = Path.GetFullPath(destinationPath);
-            ArtifactUtilities.AddTestAttachmentWithFriendlyFileName(absoluteDestinationPath, AttachmentDescription);
+            ArtifactUtilities.AddTestAttachment(absoluteDestinationPath, AttachmentDescription);
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {

@@ -12,6 +12,8 @@ namespace Winning.Playwright.NUnit.Internal;
 /// </summary>
 internal sealed class TracingRecorder
 {
+    private const string ArtifactFileNamePrefix = "Trace";
+    private const string ArtifactFileExtension = ".zip";
     private const string AttachmentDescription = "Playwright Trace";
 
     private readonly IBrowserContext context;
@@ -58,11 +60,10 @@ internal sealed class TracingRecorder
 
         if (this.traceAllTests || !testHasAnAcceptableStatus)
         {
-            var name = ArtifactUtilities.SanitizeFileName(TestContext.CurrentContext.Test.Name);
             var outcomeFolder = currentTestStatus.ToString();
             var folderPath = Path.Combine(this.artifactsDir, outcomeFolder);
             Directory.CreateDirectory(folderPath);
-            stopOptions.Path = Path.Combine(folderPath, $"{DateTime.Now:yyyyMMdd_HHmmss_fff}_{name}.zip");
+            stopOptions.Path = Path.Combine(folderPath, ArtifactUtilities.BuildArtifactFileName(ArtifactFileNamePrefix, ArtifactFileExtension));
         }
 
         await this.context.Tracing.StopAsync(stopOptions);
@@ -73,7 +74,7 @@ internal sealed class TracingRecorder
         }
 
         var absolutePath = Path.GetFullPath(stopOptions.Path);
-        ArtifactUtilities.AddTestAttachmentWithFriendlyFileName(absolutePath, AttachmentDescription);
+        ArtifactUtilities.AddTestAttachment(absolutePath, AttachmentDescription);
     }
 
     /// <summary>Starts a trace group for a stage.</summary>

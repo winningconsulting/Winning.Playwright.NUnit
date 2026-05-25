@@ -54,46 +54,22 @@ internal static partial class ArtifactUtilities
         return CollapseSpaces().Replace(spaced.Trim(), " ");
     }
 
-    /// <summary>
-    /// Registers <paramref name="artifactAbsolutePath"/> as a test attachment using a file name derived from
-    /// <paramref name="description"/> (plus the artifact extension), so loggers that ignore NUnit's description
-    /// (e.g. TRX) still show a short label. The artifact file on disk is unchanged; a symlink or copy
-    /// provides the friendly path passed to <see cref="TestContext.AddTestAttachment"/>.
-    /// </summary>
-    internal static void AddTestAttachmentWithFriendlyFileName(string artifactAbsolutePath, string description)
+    internal static string BuildArtifactFileName(string fileNamePrefix, string extension)
     {
-        var directory = Path.GetDirectoryName(artifactAbsolutePath)
-            ?? throw new InvalidOperationException("Artifact path has no directory.");
-        var extension = Path.GetExtension(artifactAbsolutePath);
-        var aliasFileName = SanitizeFileName(description) + extension;
-        var aliasAbsolutePath = Path.GetFullPath(Path.Combine(directory, aliasFileName));
-
-        if (File.Exists(aliasAbsolutePath))
-        {
-            File.Delete(aliasAbsolutePath);
-        }
-
-        CreateAttachmentAlias(artifactAbsolutePath, aliasAbsolutePath);
-
-        var relPath = Path.GetRelativePath(TestContext.CurrentContext.WorkDirectory, aliasAbsolutePath);
-        TestContext.AddTestAttachment(relPath, description);
+        var currentTest = TestContext.CurrentContext.Test;
+        var testId = SanitizeFileName(currentTest.ID);
+        var testName = SanitizeFileName(currentTest.Name);
+        return $"{SanitizeFileName(fileNamePrefix)} - {DateTime.Now:yyyyMMdd_HHmmss_fff}_{testId}_{testName}{extension}";
     }
 
-    private static void CreateAttachmentAlias(string sourceAbsolutePath, string aliasAbsolutePath)
+    /// <summary>
+    /// Registers <paramref name="artifactAbsolutePath"/> as a test attachment using a path relative to
+    /// NUnit's work directory.
+    /// </summary>
+    internal static void AddTestAttachment(string artifactAbsolutePath, string description)
     {
-        try
-        {
-            File.CreateSymbolicLink(aliasAbsolutePath, sourceAbsolutePath);
-            return;
-        }
-        catch (IOException)
-        {
-        }
-        catch (UnauthorizedAccessException)
-        {
-        }
-
-        File.Copy(sourceAbsolutePath, aliasAbsolutePath, overwrite: true);
+        var relPath = Path.GetRelativePath(TestContext.CurrentContext.WorkDirectory, artifactAbsolutePath);
+        TestContext.AddTestAttachment(relPath, description);
     }
 
     [GeneratedRegex(@"[_\-.,]+")]
